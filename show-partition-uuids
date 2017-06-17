@@ -1,0 +1,15 @@
+#!/bin/bash
+# Show UUID for each known partition
+if [ `/usr/bin/whoami` != 'root' ]; then
+        /bin/echo "Must run as root."
+        exit 1
+fi
+/bin/awk '$0 ~ /[0-9]$/ { print $NF }' /proc/partitions                 |
+/bin/sort                                                               |
+while read dev; do
+        UUID=`/sbin/blkid -s UUID -c /dev/null -o value /dev/${dev} 2>/dev/null`
+        if [ "${UUID}" ]; then
+                /bin/echo -e "${dev}\t${UUID}"
+        fi
+done
+exit 0
